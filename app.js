@@ -1,3 +1,4 @@
+getLocation()
 function getLocation (){
     navigator.geolocation.getCurrentPosition(
     function(success){
@@ -36,21 +37,20 @@ function showDaily(daily) {
          `;
     }
 }
-
-getLocation()
-function countryNameFoo(latitude,longitude){
-        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=temperature_2m,precipitation,weathercode&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`)
-    .then(
-        function(res){
-            return res.json()
-        }
-    )
-    .then(
-        function(res){
-            console.log(res)
-            var {daily} = res
-            var {hourly} = res
-            var {current_weather} = res
+function bgVideo(BGVideo){
+    var video = document.querySelector("video")
+    var source = video.querySelector("source")
+    source.src = BGVideo; 
+    video.load();              
+    video.play();
+}
+ async function countryNameFoo(latitude,longitude){
+    var weatherApi = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=temperature_2m,precipitation,weathercode&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`)
+    var weatherApiJson =await weatherApi.json()        
+    console.log(weatherApiJson)
+            var {daily} = weatherApiJson
+            var {hourly} = weatherApiJson
+            var {current_weather} = weatherApiJson
             var {temperature} = current_weather
             var {weathercode} = current_weather
             var {time} = current_weather
@@ -60,82 +60,44 @@ function countryNameFoo(latitude,longitude){
             showHourly(hourly);
             if(weathercode == 0){
                 if (newTime >= 6 && newTime < 16) {
-                    var video = document.querySelector("video")
-                    var source = video.querySelector("source")
-                    source.src = "assets/sunny day.mp4"; 
-                    video.load();              
-                    video.play();
+                    bgVideo("assets/sunny day.mp4")
                     document.querySelector("#weatherNow").textContent = "Clear sky"
                 }else if (newTime >= 16 && newTime < 20) {
-                    var video = document.querySelector("video")
-                    var source = video.querySelector("source")
-                    source.src = "assets/sunset.mp4"; 
-                    video.load();              
-                    video.play();
+                    bgVideo("assets/sunset.mp4"); 
                     document.querySelector("#weatherNow").textContent = "Clear sky"
                  } else if (newTime < 6 || newTime >= 20) {
-                    var video = document.querySelector("video")
-                    var source = video.querySelector("source")
-                    source.src = "assets/night.mp4"; 
-                    video.load();              
-                    video.play();
+                    bgVideo("assets/night.mp4"); 
                     document.querySelector("#weatherNow").textContent = "Clear sky"
                 }
             }else if(weathercode ==1 ||weathercode ==2||weathercode ==3){
                if (newTime >= 6 && newTime < 18) {
-                    var video = document.querySelector("video")
-                    var source = video.querySelector("source")
-                    source.src = "assets/clouds.mp4"; 
-                    video.load();              
-                    video.play();
+                    bgVideo("assets/clouds.mp4"); 
                     document.querySelector("#weatherNow").textContent = "cloudy"
                  }else if (newTime < 6 || newTime >= 18) {
-                    var video = document.querySelector("video")
-                    var source = video.querySelector("source")
-                    source.src = "assets/cloudy night.mp4"; 
-                    video.load();              
-                    video.play();
+                    bgVideo("assets/cloudy night.mp4"); 
                     document.querySelector("#weatherNow").textContent = "cloudy"
                 }
             }else if(weathercode ==61 ||weathercode ==63||weathercode ==65 ){
                if (newTime >= 6 && newTime < 18) {
-                 var video = document.querySelector("video")
-                var source = video.querySelector("source")
-                source.src = "assets/heavy rain.mp4"; 
-                video.load();              
-                video.play();
+                bgVideo("assets/heavy rain.mp4"); 
                 document.querySelector("#weatherNow").textContent = "heavy Rain"
                }else if (newTime < 6 || newTime >= 18) {
-                var video = document.querySelector("video")
-                var source = video.querySelector("source")
-                source.src = "assets/rain.mp4"; 
-                video.load();              
-                video.play();
+                bgVideo("assets/rain.mp4"); 
                 document.querySelector("#weatherNow").textContent = "Rain"
                }
-            }else if(weathercode ==80 ||weathercode ==81||weathercode ==82 ){
-                var video = document.querySelector("video")
-                var source = video.querySelector("source")
-                source.src = "assets/thunder.mp4"; 
-                video.load();              
-                video.play();
+            }else if(weathercode ==80 ||weathercode ==81||weathercode ==82 ){            
+                bgVideo("assets/thunder.mp4"); 
                 document.querySelector("#weatherNow").textContent = "Thunderstorm"
             }
             document.querySelector("#temp").textContent = `${temperature}°`
         }
-    )
-    .catch();
+async function cityName(latitude,longitude){
+    var cityApi = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`)
+    var cityApiJson= await cityApi.json()
+    console.log(cityApiJson)
+    var {city} = cityApiJson
+    document.querySelector("#cityName").textContent = city
 }
-function cityName(latitude,longitude){
-    fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`)
-    .then(function(res){
-        return res.json()
-    }).then(function(res){
-        console.log(res)
-        var {city} = res
-        document.querySelector("#cityName").textContent = city
-    })
-}   
 function getIcon(code) {
   if (code === 0) return `<i class="fa-solid fa-sun"></i>`;
   if ([1,2].includes(code)) return `<i class="fa-solid fa-cloud-sun"></i>`;
@@ -152,20 +114,35 @@ function showHourly(hourly) {
   const container = document.getElementById("hourlyUI");
   container.innerHTML = "";
 
-  for (let i = 0; i < hourly.time.length; i += 3) {
+  const now = new Date();
+  const currentHour = now.getHours(); // 0–23
 
-    const fullTime = hourly.time[i];
-    const hour = fullTime.slice(11, 16); // "14:00"
+  let shownHours = 0;
 
-    const temp = hourly.temperature_2m[i];
-    const code = hourly.weathercode[i];
+  for (let i = 0; i < hourly.time.length && shownHours < 12; i++) {
 
-    container.innerHTML += `
-      <li>
-        <span>${hour}</span>
-        <span>${getIcon(code)}</span>
-        <span>${temp}°</span>
-      </li>
-    `;
+    const hourTime = new Date(hourly.time[i]);
+    const hour = hourTime.getHours();
+
+    // sirf current hour se aage wali forecast
+    if (hour >= currentHour) {
+
+      // AM / PM format
+      let displayHour = hour % 12 || 12;
+      let ampm = hour >= 12 ? "PM" : "AM";
+
+      const temp = hourly.temperature_2m[i];
+      const code = hourly.weathercode[i];
+
+      container.innerHTML += `
+        <li>
+          <span>${displayHour} ${ampm}</span><br>
+          <span>${getIcon(code)}</span><br>
+          <span>${temp}°</span>
+        </li>
+      `;
+
+      shownHours++;
+    }
   }
 }

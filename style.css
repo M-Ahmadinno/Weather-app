@@ -75,13 +75,16 @@ body{
 }
 #hourlyUI li{
     height: 100px;
-    width: 100px !important;
-    padding: 20px;
-    font-size: 17px;
+    min-width: 100px;
+    padding: 24px;
+    font-size: 15px;
+    flex-shrink: 0;
 }
+
 #dailyUI li{
     height: 100px;
-    width: 100px!important;
+    min-width: 100px;
     padding: 14px;
-    font-size: 13px;
+    font-size: 17px;
+    flex-shrink: 0;
 }
