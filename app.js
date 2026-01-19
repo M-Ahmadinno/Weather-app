@@ -137,12 +137,12 @@ function cityName(latitude,longitude){
     })
 }   
 function getIcon(code) {
-  if (code === 0) return `<i class="fa-regular fa-sun"></i>`;
+  if (code === 0) return `<i class="fa-solid fa-sun"></i>`;
   if ([1,2].includes(code)) return `<i class="fa-solid fa-cloud-sun"></i>`;
-  if (code === 3) return `<i class="fa-regular fa-cloud"></i>`;
+  if (code === 3) return `<i class="fa-solid fa-cloud"></i>`;
   if ([45,48].includes(code)) return `<i class="fa-solid fa-wind"></i>`;
   if ([51,53,55,80,81,82].includes(code)) return `<i class="fa-solid fa-cloud-sun-rain"></i>`;
-  if ([61,63,65].includes(code)) return `<i class="fa-regular fa-cloud-showers-heavy"></i>`;
+  if ([61,63,65].includes(code)) return `<i class="fa-solid fa-cloud-showers-heavy"></i>`;
   if ([71,73,75].includes(code)) return `<i class="fa-light fa-snowflake"></i>`;
   if ([95,96,99].includes(code)) return `<i class="fa-solid fa-cloud-bolt"></i><i class="fa-solid fa-cloud-showers-heavy"></i>`;
   return `<i class="fa-solid fa-feather-pointed"></i>`;
