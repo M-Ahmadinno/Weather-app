@@ -1,4 +1,6 @@
 function getLocation (){
+    document.querySelector("#startBtn").style.display = "none"
+    document.querySelector("#main").style.display = "flex"
     navigator.geolocation.getCurrentPosition(
         function(success){
             console.log(success,"success")
@@ -12,7 +14,6 @@ function getLocation (){
             console.log(error)  
         });
 }
-getLocation()
 function showDaily(daily) {
         const container = document.getElementById("dailyUI");
         container.innerHTML = "";
