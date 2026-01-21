@@ -1,33 +1,29 @@
-getLocation()
 function getLocation (){
     navigator.geolocation.getCurrentPosition(
-    function(success){
-     console.log(success,"success")
-     const { coords } = success;
-     const {latitude,longitude} = coords
-     console.log(latitude,longitude)
-     countryNameFoo(latitude,longitude)
-     cityName(latitude,longitude)
-    }, 
-    function(error){
-     console.log(error)  
-    });
+        function(success){
+            console.log(success,"success")
+            const { coords } = success;
+            const {latitude,longitude} = coords
+            console.log(latitude,longitude)
+            countryNameFoo(latitude,longitude)
+            cityName(latitude,longitude)
+        }, 
+        function(error){
+            console.log(error)  
+        });
 }
+getLocation()
 function showDaily(daily) {
         const container = document.getElementById("dailyUI");
         container.innerHTML = "";
-        
         for (let i = 0; i < daily.time.length; i++) {
-        
         const date = new Date(daily.time[i]);
         const dayName = date.toLocaleDateString("en-US", {
         weekday: "long"
         });
-        
         const maxT = daily.temperature_2m_max[i];
         const minT = daily.temperature_2m_min[i];
         const code = daily.precipitation_sum[i];
-        
         container.innerHTML += `
             <li>
             <span>${dayName}</span><br>
@@ -109,31 +105,20 @@ function getIcon(code) {
   if ([95,96,99].includes(code)) return `<i class="fa-solid fa-cloud-bolt"></i><i class="fa-solid fa-cloud-showers-heavy"></i>`;
   return `<i class="fa-solid fa-feather-pointed"></i>`;
 }
-
 function showHourly(hourly) {
   const container = document.getElementById("hourlyUI");
   container.innerHTML = "";
-
   const now = new Date();
-  const currentHour = now.getHours(); // 0–23
-
+  const currentHour = now.getHours();
   let shownHours = 0;
-
   for (let i = 0; i < hourly.time.length && shownHours < 12; i++) {
-
     const hourTime = new Date(hourly.time[i]);
     const hour = hourTime.getHours();
-
-    // sirf current hour se aage wali forecast
     if (hour >= currentHour) {
-
-      // AM / PM format
       let displayHour = hour % 12 || 12;
       let ampm = hour >= 12 ? "PM" : "AM";
-
       const temp = hourly.temperature_2m[i];
       const code = hourly.weathercode[i];
-
       container.innerHTML += `
         <li>
           <span>${displayHour} ${ampm}</span><br>
@@ -141,7 +126,6 @@ function showHourly(hourly) {
           <span>${temp}°</span>
         </li>
       `;
-
       shownHours++;
     }
   }
